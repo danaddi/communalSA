@@ -1,5 +1,6 @@
 package com.example.test_app.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -10,19 +11,17 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import com.example.test_app.PaymentHistoryAdapter;
+
 import com.example.test_app.R;
 import com.example.test_app.models.UtilityData;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.database.*;
 
 import java.util.ArrayList;
@@ -35,8 +34,6 @@ public class PaymentFragment extends Fragment {
     private Button payButton;
     private ProgressBar progressBar;
     private LinearLayout historyContainer;
-
-    private PaymentHistoryAdapter historyAdapter;
     private final List<UtilityData> paymentHistory = new ArrayList<>();
 
     private FirebaseAuth mAuth;
@@ -97,7 +94,7 @@ public class PaymentFragment extends Fragment {
             updatePaymentInfo(month, electricity, water, bill);
 
             if (isAlreadyPaid(month)) {
-                statusView.setText("Уже оплачено за " + month);
+                statusView.setText(getString(R.string.payment_status) + month);
                 statusView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
                 payButton.setEnabled(false);
             } else {
@@ -118,11 +115,16 @@ public class PaymentFragment extends Fragment {
         statusView.setText("Обработка платежа...");
 
         new Handler().postDelayed(() -> {
+            if (!isAdded()) return; // Фрагмент отсоединён — ничего не делаем
+
             boolean isSuccess = new Random().nextInt(10) < 8;
 
             if (isSuccess) {
                 statusView.setText("Оплачено успешно!");
-                statusView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+                Context context = getContext();
+                if (context != null) {
+                    statusView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_dark));
+                }
 
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user != null) {
@@ -144,18 +146,22 @@ public class PaymentFragment extends Fragment {
                     });
 
                     paymentHistory.add(0, data);
-                    historyAdapter.notifyDataSetChanged();
                     updateStatistics();
                 }
             } else {
                 statusView.setText("Ошибка оплаты!");
-                statusView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
+                Context context = getContext();
+                if (context != null) {
+                    statusView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
+                }
             }
 
             progressBar.setVisibility(View.GONE);
             payButton.setEnabled(true);
+
         }, 2000);
     }
+
 
     private boolean isAlreadyPaid(String month) {
         for (UtilityData data : paymentHistory) {
@@ -231,23 +237,67 @@ public class PaymentFragment extends Fragment {
     }
 
     private void addPaymentView(UtilityData data) {
-        View itemView = LayoutInflater.from(getContext()).inflate(R.layout.item_payment_history, historyContainer, false);
+        Context context = getContext();
+        if (context == null) return;
+
+        View itemView = LayoutInflater.from(context).inflate(R.layout.item_payment_history, historyContainer, false);
 
         TextView monthText = itemView.findViewById(R.id.tvMonth);
         TextView electricityText = itemView.findViewById(R.id.tvElectricity);
         TextView waterText = itemView.findViewById(R.id.tvWater);
         TextView billText = itemView.findViewById(R.id.tvBill);
         TextView statusText = itemView.findViewById(R.id.tvStatus);
+        Button btnDelete = itemView.findViewById(R.id.delete_button);
 
         monthText.setText(data.getMonth());
         electricityText.setText("Электричество: " + data.getElectricity() + " кВт·ч");
         waterText.setText("Вода: " + data.getWater() + " м³");
         billText.setText("Сумма: " + data.getBill() + " ₽");
         statusText.setText(data.isPaid() ? "Оплачено" : "Ожидает оплаты");
-        statusText.setTextColor(ContextCompat.getColor(requireContext(),
-                data.isPaid() ? android.R.color.holo_green_dark : android.R.color.holo_red_dark));
 
+        statusText.setTextColor(ContextCompat.getColor(context,
+                data.isPaid() ? android.R.color.holo_green_dark : android.R.color.holo_red_dark));
+        // Функция удаления
+        btnDelete.setOnClickListener(v -> {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                String uid = user.getUid();
+                DatabaseReference userRef = FirebaseDatabase.getInstance()
+                        .getReference("payments")
+                        .child(uid);
+
+                // Найдём запись в базе, сравнивая поля
+                userRef.orderByChild("month").equalTo(data.getMonth())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot entrySnapshot : snapshot.getChildren()) {
+                                    UtilityData entry = entrySnapshot.getValue(UtilityData.class);
+                                    if (entry != null &&
+                                            entry.getElectricity() == data.getElectricity() &&
+                                            entry.getWater() == data.getWater() &&
+                                            entry.getBill() == data.getBill()) {
+
+                                        entrySnapshot.getRef().removeValue()
+                                                .addOnSuccessListener(unused -> {
+                                                    historyContainer.removeView(itemView);
+                                                    paymentHistory.remove(data);
+                                                    updateStatistics();
+                                                });
+                                        break;
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Log.e("DELETE", "Ошибка при удалении: " + error.getMessage());
+                            }
+                        });
+            }
+        });
         historyContainer.addView(itemView);
     }
+
 
 }
