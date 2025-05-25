@@ -48,6 +48,12 @@
                 android:layout_height="wrap_content"
                 android:hint="Password"
                 android:inputType="textPassword" />
+
+            <CheckBox
+                android:id="@+id/cbShowPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Показать пароль" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Login Button -->

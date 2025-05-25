@@ -2,7 +2,9 @@ package com.example.test_app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -16,10 +18,27 @@ public class MainActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
     private Button btnRegister, btnLogin;
 
+    private CheckBox cbShowPassword;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        cbShowPassword = findViewById(R.id.cbShowPassword);
+
+        cbShowPassword.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                // Показать пароль
+                etPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            } else {
+                // Скрыть пароль
+                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+            etPassword.setSelection(etPassword.getText().length()); // Сохраняет курсор в конце
+        });
+
 
         // Инициализация Firebase Auth
         mAuth = FirebaseAuth.getInstance();
