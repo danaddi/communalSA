@@ -137,22 +137,28 @@ public class MainActivity extends AppCompatActivity {
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(name)
                                     .build();
-                            user.updateProfile(profileUpdates);
+                            user.updateProfile(profileUpdates).addOnCompleteListener(profileTask -> {
+                                if (profileTask.isSuccessful()) {
+                                    // Можно также сохранить имя в Realtime Database, если нужно
+                                    DatabaseReference userRef = FirebaseDatabase.getInstance()
+                                            .getReference("users")
+                                            .child(user.getUid());
 
-                            DatabaseReference userRef = FirebaseDatabase.getInstance()
-                                    .getReference("users")
-                                    .child(user.getUid());
+                                    Map<String, Object> userMap = new HashMap<>();
+                                    userMap.put("name", name);
+                                    userMap.put("email", email);
 
-                            Map<String, Object> userMap = new HashMap<>();
-                            userMap.put("name", name);
-                            userMap.put("email", email);
-
-                            userRef.setValue(userMap).addOnCompleteListener(saveTask -> {
-                                if (saveTask.isSuccessful()) {
-                                    Toast.makeText(MainActivity.this, "Регистрация успешна!", Toast.LENGTH_SHORT).show();
-                                    updateUI(user);
+                                    userRef.setValue(userMap).addOnCompleteListener(saveTask -> {
+                                        if (saveTask.isSuccessful()) {
+                                            Toast.makeText(MainActivity.this, "Регистрация успешна!", Toast.LENGTH_SHORT).show();
+                                            updateUI(user);
+                                        } else {
+                                            Toast.makeText(MainActivity.this, "Ошибка сохранения данных: " + saveTask.getException().getMessage(),
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                 } else {
-                                    Toast.makeText(MainActivity.this, "Ошибка сохранения данных: " + saveTask.getException().getMessage(),
+                                    Toast.makeText(MainActivity.this, "Ошибка обновления профиля: " + profileTask.getException().getMessage(),
                                             Toast.LENGTH_SHORT).show();
                                 }
                             });
