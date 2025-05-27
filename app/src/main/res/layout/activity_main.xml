@@ -1,81 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/background_light"
     android:padding="24dp">
 
-    <LinearLayout
+    <!-- Круглая карточка с логотипом -->
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CircleCard"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="32dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/account_circle"
+            android:contentDescription="App Logo"
+            android:scaleType="centerInside"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Карточка с формой -->
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:layout_marginBottom="16dp">
 
-        <!-- Заголовок или логотип -->
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginBottom="32dp"
-            android:src="@drawable/ic_launcher_foreground"
-            android:contentDescription="App Logo" />
-
-        <!-- Email -->
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            android:orientation="vertical"
+            android:padding="24dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEmail"
+            <!-- Имя -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/DarkTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email"
-                android:inputType="textEmailAddress" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="20dp">
 
-        <!-- Password -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Имя"
+                    android:inputType="textPersonName"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPassword"
+            <!-- Email -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/DarkTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password"
-                android:inputType="textPassword" />
+                android:layout_marginBottom="20dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/DarkTextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Пароль"
+                    android:inputType="textPassword"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <CheckBox
                 android:id="@+id/cbShowPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Показать пароль" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="Показать пароль"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="20dp"/>
 
-        <!-- Login Button -->
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="Login"
-            android:textAllCaps="false"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/purple"
-            android:textColor="@android:color/white" />
+            <!-- Login Button -->
+            <Button
+                android:id="@+id/btnLogin"
+                style="@style/PrimaryButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:text="Войти"/>
 
-        <!-- Register Button -->
-        <Button
-            android:id="@+id/btnRegister"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="Register"
-            android:textAllCaps="false"
-            android:backgroundTint="@android:color/darker_gray"
-            android:textColor="@android:color/white" />
-
-    </LinearLayout>
-</ScrollView>
+            <!-- Register Button -->
+            <Button
+                android:id="@+id/btnRegister"
+                style="@style/SecondaryButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Регистрация"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

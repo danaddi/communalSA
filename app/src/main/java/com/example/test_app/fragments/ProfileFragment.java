@@ -12,14 +12,20 @@ import com.example.test_app.MainActivity;
 import com.example.test_app.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ProfileFragment extends Fragment {
 
-    private TextView tvEmail;
+    private TextView tvEmail, tvName;
     private Button btnLogout, btnDelete;
 
     private FirebaseAuth mAuth;
+
+    private DatabaseReference userRef;
 
     @Nullable
     @Override
@@ -27,6 +33,7 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         tvEmail = view.findViewById(R.id.tvEmail);
+        tvName = view.findViewById(R.id.tvName);
         btnLogout = view.findViewById(R.id.btnLogout);
         btnDelete = view.findViewById(R.id.btnDelete);
         mAuth = FirebaseAuth.getInstance();
@@ -34,6 +41,9 @@ public class ProfileFragment extends Fragment {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             tvEmail.setText(user.getEmail());
+            userRef = FirebaseDatabase.getInstance().getReference("payments").child(user.getUid());
+            // Загружаем имя пользователя
+            loadUserName();
         }
 
         btnLogout.setOnClickListener(v -> {
@@ -46,6 +56,33 @@ public class ProfileFragment extends Fragment {
 
         return view;
     }
+
+    private void loadUserName() {
+        userRef.child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (getView() == null) return;
+
+                String name = snapshot.getValue(String.class);
+
+                if (name != null && !name.isEmpty()) {
+                    tvName.setText(name);
+                } else {
+                    tvName.setText("Имя не указано");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                if (getView() != null) {
+                    Toast.makeText(getContext(), "Ошибка загрузки имени", Toast.LENGTH_SHORT).show();
+                    tvName.setText("Ошибка загрузки");
+                }
+            }
+        });
+    }
+
+
 
     private void showDeleteConfirmation() {
         new AlertDialog.Builder(getContext())
@@ -76,4 +113,5 @@ public class ProfileFragment extends Fragment {
             });
         }
     }
+
 }

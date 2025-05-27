@@ -1,7 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="background_dark">#F5F5F5</color> <!-- для совместимости -->
+    <color name="background_light">#F5F5F5</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="accent_lime">#CCFF00</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
     <color name="purple">#8B00FF</color>
     <color name="light_purple">#CCCCFF</color>
+    <color name="outline_gray">#E0E0E0</color>
+    <color name="button_outline">#BDBDBD</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
 </resources>

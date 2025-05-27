@@ -2,80 +2,91 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:background="@color/background_light"
+    android:padding="20dp"
     android:fillViewport="true">
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <!-- Поле для месяца -->
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Период оплаты"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp"/>
+            android:orientation="vertical"
+            android:padding="24dp">
 
-        <EditText
-            android:id="@+id/editTextMonth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Например: Май 2025"
-            android:inputType="textCapWords"
-            android:layout_marginBottom="16dp"/>
+            <!-- Поле для месяца -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/DarkTextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp">
 
-        <!-- Поле для электричества -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Показания электросчетчика (кВт·ч)"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextMonth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Период оплаты (например: Май 2025)"
+                    android:inputType="textCapWords"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/editTextElectricity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Введите количество кВт·ч"
-            android:inputType="number"
-            android:layout_marginBottom="16dp"/>
+            <!-- Поле для электричества -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/DarkTextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp">
 
-        <!-- Поле для воды -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Показания водосчетчика (м³)"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextElectricity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Показания электросчетчика (кВт·ч)"
+                    android:inputType="number"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/editTextWater"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Введите количество м³"
-            android:inputType="number"
-            android:layout_marginBottom="24dp"/>
+            <!-- Поле для воды -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/DarkTextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp">
 
-        <!-- Сумма к оплате -->
-        <TextView
-            android:id="@+id/textViewBill"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Сумма к оплате: 0 ₽"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextWater"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Показания водосчетчика (м³)"
+                    android:inputType="number"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Кнопка отправки -->
-        <Button
-            android:id="@+id/buttonSubmit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Перейти к оплате"
-            android:backgroundTint="@color/purple"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <!-- Сумма к оплате -->
+            <TextView
+                android:id="@+id/textViewBill"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Сумма к оплате: 0 ₽"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/accent_lime"
+                android:layout_marginBottom="24dp"
+                android:fontFamily="sans-serif-medium"/>
+
+            <!-- Кнопка отправки -->
+            <Button
+                android:id="@+id/buttonSubmit"
+                style="@style/PrimaryButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Перейти к оплате"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 </ScrollView>

@@ -12,14 +12,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
-    private EditText etEmail, etPassword;
+    private EditText etEmail, etPassword, etName;
     private Button btnRegister, btnLogin;
 
     private CheckBox cbShowPassword;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +44,11 @@ public class MainActivity extends AppCompatActivity {
             etPassword.setSelection(etPassword.getText().length()); // Сохраняет курсор в конце
         });
 
-
         // Инициализация Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
         // Инициализация UI элементов
+        etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnRegister = findViewById(R.id.btnRegister);
@@ -51,11 +56,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Обработчики кнопок
         btnRegister.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
-            if (validateInputs(email, password)) {
-                registerUser(email, password);
+            if (validateInputs(name, email, password)) {
+                registerUser(name, email, password);
             }
         });
 
@@ -63,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
-            if (validateInputs(email, password)) {
+            if (validateInputsLogin(email, password)) {
                 loginUser(email, password);
             }
         });
@@ -71,7 +77,13 @@ public class MainActivity extends AppCompatActivity {
         //здесь была навигация нижняя bottombar
     }
 
-    private boolean validateInputs(String email, String password) {
+    private boolean validateInputs(String name, String email, String password) {
+        if (name.isEmpty()) {
+            etName.setError("Имя обязательно");
+            etName.requestFocus();
+            return false;
+        }
+
         if (email.isEmpty()) {
             etEmail.setError("Email is required");
             etEmail.requestFocus();
@@ -93,15 +105,60 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void registerUser(String email, String password) {
+    private boolean validateInputsLogin(String email, String password) {
+        if (email.isEmpty()) {
+            etEmail.setError("Email is required");
+            etEmail.requestFocus();
+            return false;
+        }
+
+        if (password.isEmpty()) {
+            etPassword.setError("Password is required");
+            etPassword.requestFocus();
+            return false;
+        }
+
+        if (password.length() < 6) {
+            etPassword.setError("Password should be at least 6 characters");
+            etPassword.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void registerUser(String name, String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(MainActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-                        updateUI(user);
+                        if (user != null) {
+                            // Сохраняем имя в профиле пользователя (Firebase Authentication)
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(name)
+                                    .build();
+                            user.updateProfile(profileUpdates);
+
+                            DatabaseReference userRef = FirebaseDatabase.getInstance()
+                                    .getReference("users")
+                                    .child(user.getUid());
+
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("name", name);
+                            userMap.put("email", email);
+
+                            userRef.setValue(userMap).addOnCompleteListener(saveTask -> {
+                                if (saveTask.isSuccessful()) {
+                                    Toast.makeText(MainActivity.this, "Регистрация успешна!", Toast.LENGTH_SHORT).show();
+                                    updateUI(user);
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Ошибка сохранения данных: " + saveTask.getException().getMessage(),
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     } else {
-                        Toast.makeText(MainActivity.this, "Registration failed: " + task.getException().getMessage(),
+                        Toast.makeText(MainActivity.this, "Ошибка регистрации: " + task.getException().getMessage(),
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
