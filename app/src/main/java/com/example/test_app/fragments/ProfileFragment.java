@@ -12,7 +12,6 @@ import com.example.test_app.MainActivity;
 import com.example.test_app.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class ProfileFragment extends Fragment {
@@ -26,6 +25,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        requireActivity().setTitle("Профиль");
 
         tvEmail = view.findViewById(R.id.tvEmail);
         tvName = view.findViewById(R.id.tvName);

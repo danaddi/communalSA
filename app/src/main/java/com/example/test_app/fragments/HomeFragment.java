@@ -27,8 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class HomeFragment extends Fragment {
 
-    private TextView welcomeText, featuresText, statsText, tipText;
-    private MaterialCardView statsCard;
+    private TextView welcomeText, featuresText, tipText;
     private Handler notificationHandler = new Handler(Looper.getMainLooper());
     private Runnable notificationRunnable;
     private static final int FIRST_DELAY_MS = 10000; // 10 секунд
@@ -44,15 +43,15 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        requireActivity().setTitle("Главная");
+
 
         welcomeText = view.findViewById(R.id.tvWelcome);
         featuresText = view.findViewById(R.id.tvFeatures);
-        statsText = view.findViewById(R.id.tvStats);
         tipText = view.findViewById(R.id.tvTip);
 
         setWelcomeMessage();
         setFeaturesList();
-        loadUserStats();
         setTip();
 
         startNotificationSchedule(view);
@@ -115,37 +114,6 @@ public class HomeFragment extends Fragment {
         featuresText.setText(features);
     }
 
-    private void loadUserStats() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            statsText.setText("Статистика недоступна");
-            return;
-        }
-        String uid = user.getUid();
-        DatabaseReference statsRef = FirebaseDatabase.getInstance().getReference("user_stats").child(uid);
-        statsRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                DataSnapshot snapshot = task.getResult();
-                long paymentsCount = snapshot.child("payments_count").getValue(Long.class) != null ?
-                        snapshot.child("payments_count").getValue(Long.class) : 0;
-                double paymentsSum = snapshot.child("payments_sum").getValue(Double.class) != null ?
-                        snapshot.child("payments_sum").getValue(Double.class) : 0.0;
-                boolean isTopCount = snapshot.child("is_top_count").getValue(Boolean.class) != null ?
-                        snapshot.child("is_top_count").getValue(Boolean.class) : false;
-                boolean isTopSum = snapshot.child("is_top_sum").getValue(Boolean.class) != null ?
-                        snapshot.child("is_top_sum").getValue(Boolean.class) : false;
-
-                StringBuilder stats = new StringBuilder();
-                stats.append("Совершено платежей: ").append(paymentsCount).append("\n");
-                stats.append("Общая сумма: ").append(String.format("%.2f ₽", paymentsSum)).append("\n");
-                if (isTopCount) stats.append("Вы в топе по количеству платежей!\n");
-                if (isTopSum) stats.append("Вы в топе по сумме платежей!\n");
-                statsText.setText(stats.toString());
-            } else {
-                statsText.setText("Статистика недоступна");
-            }
-        });
-    }
 
     private void setTip() {
         tipText.setText("Совет: Вносите показания вовремя, чтобы избежать переплат!");

@@ -39,7 +39,6 @@ public class PaymentFragment extends Fragment {
     private FirebaseAuth mAuth;
     private DatabaseReference databaseRef;
 
-    private final List<String> paymentKeys = new ArrayList<>();
 
 
     @Nullable
@@ -47,7 +46,7 @@ public class PaymentFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_payment, container, false);
-
+        requireActivity().setTitle("Оплата");
         FirebaseApp.initializeApp(requireContext());
 
         mAuth = FirebaseAuth.getInstance();

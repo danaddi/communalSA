@@ -33,7 +33,7 @@ public class InputFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_input, container, false);
-
+        requireActivity().setTitle("Ввод");
         initViews(view);
         setupTextWatchers();
         setupSubmitButton();
